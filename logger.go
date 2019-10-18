@@ -19,26 +19,26 @@ type Logger struct {
 	err_level int
 }
 
-func (logger *Logger) Debug(msg string) (n int, err error) {
+func (logger *Logger) Debug(msg interface{}) (n int, err error) {
 	logger.err_level = DEBUG
-	return logger.Write([]byte(msg))
+	return logger.Write([]byte(logger.convert(msg)))
 }
 
-func (logger *Logger) Notice(msg string) (n int, err error) {
+func (logger *Logger) Notice(msg interface{}) (n int, err error) {
 	logger.err_level = NOTICE
-	n, err = logger.Write([]byte(msg))
+	n, err = logger.Write([]byte(logger.convert(msg)))
 	return n, err
 }
 
-func (logger *Logger) Warning(msg string) (n int, err error) {
+func (logger *Logger) Warning(msg interface{}) (n int, err error) {
 	logger.err_level = WARNING
-	n, err = logger.Write([]byte(msg))
+	n, err = logger.Write([]byte(logger.convert(msg)))
 	return n, err
 }
 
-func (logger *Logger) Error(msg string) (n int, err error) {
+func (logger *Logger) Error(msg interface{}) (n int, err error) {
 	logger.err_level = ERROR
-	n, err = logger.Write([]byte(msg))
+	n, err = logger.Write([]byte(logger.convert(msg)))
 	return n, err
 }
 
@@ -56,6 +56,10 @@ func (logger *Logger) Write(msg []byte) (n int, err error) {
 	msg = []byte(fmt.Sprintf("[%s] %s %s\n", levelStr, time.Now().Format("2006-01-01 15:04:05"), msg))
 	n, err = logger.Device.Write(msg)
 	return n, err
+}
+
+func (logger *Logger) convert(msg interface{}) string {
+	return fmt.Sprintf("%s", msg)
 }
 
 func (logger *Logger) levelToString(err_level int) string {
